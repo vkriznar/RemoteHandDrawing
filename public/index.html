@@ -19,9 +19,9 @@
 </head>
 <body>
     <main id="hand-app">
-        <canvas id="canvas" width="640" height="480" style="margin: 3px 3px 3px 3px"></canvas>
+        <canvas id="canvas" width="640" height="480" style="margin: 3px 3px 3px 3px""></canvas>
         <canvas id="canvas1" width="640" height="480" style="margin: 3px 3px 3px 3px"></canvas>
-        <video id="webcam" autoplay playsinline width="640" height="480" style="left:40%"></video>
+        <video id="webcam" autoplay playsinline width="640" height="480" style="left:40%; transform: scale(-1, 1);"></video>
     </main>
     <input id="colorpicker" value="#1a1aff" data-jscolor="{onInput:'update(this)', alpha:1.0}">
     <button id="clearcanvas" onclick="clearCanvas()">Clear Canvas</button>
