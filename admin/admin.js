@@ -48,3 +48,7 @@ function getClient(clientId) {
 
     return clientArray[0];
 }
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+}

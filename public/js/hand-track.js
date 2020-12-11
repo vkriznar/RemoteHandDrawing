@@ -6,13 +6,18 @@ const canvasElement1 = document.getElementById('canvas1');
 const canvasCtx1 = canvasElement1.getContext("2d");
 canvasCtx1.lineWidth = 6;
 
+canvasCtx.translate(canvasElement.width, 0);
+canvasCtx.scale(-1, 1);
+canvasCtx1.translate(canvasElement.width, 0);
+canvasCtx1.scale(-1, 1);
+
 let lastPoint = null;
 const socket = io.connect("https://188.230.231.221:3000");
 
 function onResults(results) {  
     // Draw the overlays.
     canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+	canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(
     results.image, 0, 0, canvasElement.width, canvasElement.height);
     if (results.multiHandLandmarks && results.multiHandedness) {
