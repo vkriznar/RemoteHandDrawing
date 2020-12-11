@@ -1,0 +1,91 @@
+#hand-app {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: black;
+    height: 90vh;
+}
+
+#app-panel{
+    background-color: black;
+}
+
+.webcam-container{
+    background: black;
+    margin: 30px 30px 30px 30px;
+}
+
+#webcam {
+    height: 65vh;
+    width: 65vw;
+    margin: 3px 3px 3px 3px;
+}
+
+#canvas{
+    background-color: green;
+    position: absolute;
+    height: 65vh;
+    z-index: 99999;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#canvas1{
+    background-color: transparent;
+    position: absolute;
+    height: 65vh;
+    z-index: 999999;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.loading{
+    position: fixed;
+    top: 35%;
+    left: 42%;
+    z-index:300000;
+    border: white 1px;
+    color: white;
+    padding: 75px 26px;
+    font-size: 22px;
+}
+
+.spinner-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    color: white;
+    z-index:300000;
+    filter: alpha(opacity=80);
+    -moz-opacity: 0.8;
+    opacity: 0.8;   
+}
+
+@media screen and (max-width: 757px) {
+
+    .loading{
+        position: fixed;
+        left: 30%;
+        padding: 55px 12px;
+        font-size: large;
+    }
+    .spinner-border{
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    #hand-app {
+        width: 50vw;
+        height: 50vh;
+    }
+}

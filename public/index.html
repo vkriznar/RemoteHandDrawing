@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Hand Drawing - 7</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel='stylesheet' type='text/css' media='screen' href='style/webcam.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='style/hand-track.css'>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <script type="text/javascript" src="https://unpkg.com/webcam-easy/dist/webcam-easy.min.js"></script>
+</head>
+<body>
+    <main id="hand-app">
+        <canvas id="canvas" width="640" height="480" style="margin: 3px 3px 3px 3px"></canvas>
+        <canvas id="canvas1" width="640" height="480" style="margin: 3px 3px 3px 3px"></canvas>
+        <video id="webcam" autoplay playsinline width="640" height="480" style="left:40%"></video>
+    </main>
+    <input id="colorpicker" value="#1a1aff" data-jscolor="{onInput:'update(this)', alpha:1.0}">
+    <button id="clearcanvas" onclick="clearCanvas()">Clear Canvas</button>
+
+    <script src="js/jscolor.js"></script>
+    <script src='js/hand-track.js'></script>
+</body>
+</html>
