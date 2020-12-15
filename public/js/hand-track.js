@@ -5,6 +5,7 @@ const canvasCtx = canvasElement.getContext("2d");
 const canvasElement1 = document.getElementById('canvas1');
 const canvasCtx1 = canvasElement1.getContext("2d");
 canvasCtx1.lineWidth = 6;
+canvasCtx1.lineJoin = canvasCtx1.lineCap = "round";
 
 canvasCtx.translate(canvasElement.width, 0);
 canvasCtx.scale(-1, 1);
