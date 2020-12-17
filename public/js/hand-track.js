@@ -64,16 +64,17 @@ function determinePose(handLandmarks) {
 	if (handLandmarks[16].y > handLandmarks[14].y && handLandmarks[15].y > handLandmarks[14].y) {
 		// Middle finger pointed down
 		if (handLandmarks[12].y > handLandmarks[10].y && handLandmarks[11].y > handLandmarks[10].y) {
-			// Pointing && Pinky fingers pointed down
+			// Pointing && Pinky fingers pointed down && distance between middle finger and thumb small enough
 			if (handLandmarks[8].y > handLandmarks[6].y && handLandmarks[7].y > handLandmarks[6].y &&
-				handLandmarks[20].y > handLandmarks[18].y && handLandmarks[19].y > handLandmarks[18].y) {
+				handLandmarks[20].y > handLandmarks[18].y && handLandmarks[19].y > handLandmarks[18].y &&
+				dis(handLandmarks[12], handLandmarks[4]) < 0.2) {
 				return "FIST";
 			} 
 			// Pointing && Pinky fingers pointed up
 			else if (handLandmarks[8].y < handLandmarks[6].y && handLandmarks[7].y < handLandmarks[6].y &&
 					handLandmarks[20].y < handLandmarks[18].y && handLandmarks[19].y < handLandmarks[18].y) {
 				return "ROCK'N'ROLL";
-			} else { return "undefined"; }
+			} else { return undefined; }
 		}
 
 		// Pinky finbger pointed down && Pointer finger pointed up && Distance between middle & pointer finger large enough
@@ -81,7 +82,7 @@ function determinePose(handLandmarks) {
 				handLandmarks[8].y < handLandmarks[6].y && handLandmarks[7].y < handLandmarks[6].y &&
 				dis(handLandmarks[8], handLandmarks[12]) > 0.11) {
 			return "PEACE";
-		} else { return "undefined"; }
+		} else { return undefined; }
 	}
 	// Ring && Middle && Pinky finger pointed up
 	else if (handLandmarks[12].y < handLandmarks[10].y && handLandmarks[11].y < handLandmarks[10].y &&
