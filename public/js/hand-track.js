@@ -1,3 +1,4 @@
+const textElement = document.getElementById("pose");
 const webcamElement = document.getElementById('webcam');
 const canvasElement = document.getElementById('canvas');
 const canvasCtx = canvasElement.getContext("2d");
@@ -36,6 +37,9 @@ function onResults(results) {
 			});
 		}
 
+		let handPose = determinePose(results.multiHandLandmarks[0]);
+		textElement.innerHTML = handPose;
+
 		if (results.multiHandLandmarks[0][8]) {
 			let pointerFinger = [results.multiHandLandmarks[0][8].x, results.multiHandLandmarks[0][8].y];
 
@@ -53,6 +57,54 @@ function onResults(results) {
 		}
     }
   canvasCtx.restore();  
+}
+
+function determinePose(handLandmarks) {
+	// Ring finger folded down
+	if (handLandmarks[16].y > handLandmarks[14].y && handLandmarks[15].y > handLandmarks[14].y) {
+		// Middle finger pointed down
+		if (handLandmarks[12].y > handLandmarks[10].y && handLandmarks[11].y > handLandmarks[10].y) {
+			// Pointing && Pinky fingers pointed down
+			if (handLandmarks[8].y > handLandmarks[6].y && handLandmarks[7].y > handLandmarks[6].y &&
+				handLandmarks[20].y > handLandmarks[18].y && handLandmarks[19].y > handLandmarks[18].y) {
+				return "FIST";
+			} 
+			// Pointing && Pinky fingers pointed up
+			else if (handLandmarks[8].y < handLandmarks[6].y && handLandmarks[7].y < handLandmarks[6].y &&
+					handLandmarks[20].y < handLandmarks[18].y && handLandmarks[19].y < handLandmarks[18].y) {
+				return "ROCK'N'ROLL";
+			} else { return "undefined"; }
+		}
+
+		// Pinky finbger pointed down && Pointer finger pointed up && Distance between middle & pointer finger large enough
+		else if (handLandmarks[20].y > handLandmarks[18].y && handLandmarks[19].y > handLandmarks[18].y &&
+				handLandmarks[8].y < handLandmarks[6].y && handLandmarks[7].y < handLandmarks[6].y &&
+				dis(handLandmarks[8], handLandmarks[12]) > 0.11) {
+			return "PEACE";
+		} else { return "undefined"; }
+	}
+	// Ring && Middle && Pinky finger pointed up
+	else if (handLandmarks[12].y < handLandmarks[10].y && handLandmarks[11].y < handLandmarks[10].y &&
+			handLandmarks[20].y < handLandmarks[18].y && handLandmarks[19].y < handLandmarks[18].y) {
+		// Thumb & Pointer finger ends close together
+		if (dis(handLandmarks[4], handLandmarks[8]) < 0.06) {
+			return "OK";
+		}
+		// Distance beetween all neighboor fingers (apart from thumb) small enough
+		else if (dis(handLandmarks[8], handLandmarks[12]) < 0.10 &&
+				dis(handLandmarks[12], handLandmarks[16]) < 0.10 &&
+				dis(handLandmarks[15], handLandmarks[20]) < 0.10) {
+			return "PALM_TOGHETHER";
+		} else {
+			return "PALM_OPEN";
+		}
+	}
+}
+
+function dis(pointA, pointB) {
+	dx = pointA.x - pointB.x
+	dy = pointA.y - pointB.y
+	return Math.sqrt(dx*dx + dy*dy);
 }
 
 const hands = new Hands({locateFile: (file) => {
