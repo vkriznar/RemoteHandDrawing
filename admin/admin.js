@@ -2,6 +2,9 @@ let socket;
 const canvasElement = document.getElementById('canvas');
 const ctx = canvasElement.getContext("2d");
 
+ctx.translate(canvasElement.width, 0);
+ctx.scale(-1, 1);
+
 socket = io.connect("https://188.230.231.221:3000");
 const clients = [];
 ctx.lineWidth = 6;
