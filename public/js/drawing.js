@@ -6,26 +6,24 @@ function drawLine(ctx, canvasEle, pointA, pointB, lineWidth) {
     ctx.stroke();
 }
 
-function drawCircle(ctx, canvasEle, point, size) {
-    radius = 8 + size;
-
-    ctx.strokeStyle = "black";
+function drawStickingLine(ctx, canvasEle, point, points) {
     ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(point[0] * canvasEle.width, point[1] * canvasEle.height, radius, false, Math.PI * 2, false);
-    ctx.fill();
-    ctx.stroke();
-}
+    let w = canvasEle.width;
+    let h = canvasEle.height;
 
-function drawSquare(ctx, canvasEle, point, size) {
-    diag = 8 + size;
+    for (let i=0; i < points.length; i++) {
+        dx = point[0] - points[i][0];
+        dy = point[1] - points[i][1];
+        d =  Math.sqrt(dx*dx + dy*dy);
 
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.rect(point[0] * canvasEle.width - diag, point[1] * canvasEle.height - diag, diag * 2, diag * 2);
-    ctx.fill();
-    ctx.stroke();
+        if (d < 0.06) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+            ctx.moveTo(lastPoint[0]*w + (dx * 0.2 * w), lastPoint[1]*h + (dy * 0.2 * h));
+            ctx.lineTo(points[i][0]*w - (dx * 0.2 * w), points[i][1]*h - (dy * 0.2 * h));
+            ctx.stroke();
+        }
+    }
 }
 
 function drawImage(ctx, canvasEle, point, img, count) {
@@ -35,7 +33,7 @@ function drawImage(ctx, canvasEle, point, img, count) {
 
 function drawSpace(ctx, canvasEle, pointA, pointB, lineWidth, strokeStyle) {
     ctx.strokeStyle = strokeStyle;
-    ctx.lineWidth = 10 + lineWidth;
+    ctx.lineWidth = 16 + lineWidth * 2;
 
     ctx.beginPath();
     ctx.moveTo(pointA[0] * canvasEle.width, pointA[1] * canvasEle.height);

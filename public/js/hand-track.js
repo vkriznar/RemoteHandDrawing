@@ -16,9 +16,13 @@ ctx.scale(-1, 1);
 let lastPoint = null;
 let percent = 0;
 let nonePercent = 0;
+let resetPercent = 0;
 let count = 0;
-let lockedPose;
-spaceStyle = null;
+let points = [];
+let lockedPose = null;
+let spaceStyle = null;
+let rockStyle = null;
+rockImages = [];
 const socket = io.connect("https://188.230.231.221:3000");
 
 function onResults(results) {  
@@ -45,44 +49,76 @@ function onResults(results) {
 			});
 		}
 
-		if (!lockedPose) {
+		// Reset canvas if user holds two hands up for a longer period
+		if (results.multiHandLandmarks.length > 1) {
+			if (resetPercent >= 100) {
+				percent = 0;
+				count = 0;
+				points = [];
+				lockedPose = null;
+				action = PoseEnum.NONE;
+				textElement.innerHTML = "Pose: " + PoseEnum.NONE;
+				ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+			} else { resetPercent += 1.8; }
+		} else { 
+			resetPercent = 0;
+
+			// Determine hand pose
 			let handPose = determinePose(results.multiHandLandmarks[0]);
-			textElement.innerHTML = handPose;
-		}
-		
-		if (results.multiHandLandmarks[0][8]) {
-			let pointerFinger = [results.multiHandLandmarks[0][8].x, results.multiHandLandmarks[0][8].y];
 
-			if (lastPoint === null) {
-				lastPoint = pointerFinger;
-			} else {
-				if (results.multiHandLandmarks.length < 2) {
-					for (let i = 0; i < 3; i++) {
-						if (dis(results.multiHandLandmarks[0][8 + i*4], results.multiHandLandmarks[0][12 + i*4]) < 0.05)
-							lineWidth += 4;
+			// If hand pose doesn't equal NONE than increment percent
+			if (handPose !== PoseEnum.NONE && handPose !== PoseEnum.FIST && lockedPose === null) {
+				percent += 2.8;
+
+				// If percent reaches 100% lock pose and set the text element
+				if (percent >= 100) {
+					lockedPose = handPose;
+					textElement.innerHTML = "Locked Pose: " + handPose;
+					if (lockedPose === PoseEnum.ROCK) {
+						randomImg = rockImages[Math.floor(Math.random() * rockImages.length)];
+						rockStyle = ctx.createPattern(randomImg, "repeat");
 					}
+				} else textElement.innerHTML = `Pose: ${handPose} - Loading ${Math.floor(percent)}`;
+			}
+			
+			if (results.multiHandLandmarks[0][8]) {
+				let pointerFinger = [results.multiHandLandmarks[0][8].x, results.multiHandLandmarks[0][8].y];
 
-					drawBasedOnAction(lastPoint, pointerFinger, lineWidth);
+				if (lastPoint === null) {
 					lastPoint = pointerFinger;
-					socket.emit("point", {x: pointerFinger[0], y: pointerFinger[1]});
-				} else { lastPoint = null; }
+				} else {
+					// Draw if user is not showing FIST pose since that pose tells the program not to draw
+					if (handPose !== PoseEnum.FIST) {
+						for (let i = 0; i < 3; i++) {
+							// For every pair of fingers close toghether increment line width
+							if (dis(results.multiHandLandmarks[0][8 + i*4], results.multiHandLandmarks[0][12 + i*4]) < 0.05)
+								lineWidth += 4;
+						}
+
+						// Draw based on locked action
+						drawBasedOnLockedAction(lastPoint, pointerFinger, lineWidth);
+						lastPoint = pointerFinger;
+						socket.emit("point", {x: pointerFinger[0], y: pointerFinger[1]});
+					} else { lastPoint = null; }
+				}
 			}
 		}
-    } else {
+	} else {
 		lastPoint = null;
 
 		if (nonePercent >= 100) {
 			percent = 0;
 			count = 0;
-			lockedPose = undefined;
+			points = [];
+			lockedPose = null;
 			action = PoseEnum.NONE;
 			textElement.innerHTML = "Pose: " + PoseEnum.NONE;
-		} else { nonePercent += 2.8; }
+		} else { nonePercent += 1; }
 	}
-  canvasCtx.restore();  
+  	canvasCtx.restore();  
 }
 
-function drawBasedOnAction(lastPoint, pointerFinger, lineWidth) {
+function drawBasedOnLockedAction(lastPoint, pointerFinger, lineWidth) {
 	// If action is not locked then we went draw just yet
 	if (!lockedPose || lockedPose === PoseEnum.NONE) return;
 
@@ -90,15 +126,13 @@ function drawBasedOnAction(lastPoint, pointerFinger, lineWidth) {
 		case PoseEnum.OPEN:
 			drawLine(ctx, canvasElement1, lastPoint, pointerFinger, lineWidth);
 			break;
-		case PoseEnum.FIST:
-			drawCircle(ctx, canvasElement1, pointerFinger, lineWidth);
-			break;
 		case PoseEnum.TOGETHER:
-			drawSquare(ctx, canvasElement1, pointerFinger, lineWidth);
+			drawStickingLine(ctx, canvasElement1, pointerFinger, points);
+			points.push(pointerFinger);
 			break;
 		case PoseEnum.ROCK:
 			count++;
-			drawImage(ctx, canvasElement1, pointerFinger, rockImg, count);
+			drawSpace(ctx, canvasElement1, lastPoint, pointerFinger, lineWidth, rockStyle);
 			break;
 		case PoseEnum.PEACE:
 			count++;
@@ -113,10 +147,6 @@ function drawBasedOnAction(lastPoint, pointerFinger, lineWidth) {
 }
 
 function determinePose(handLandmarks) {
-	if (percent >= 100) {
-		lockedPose = action;
-		return `Locked Pose: ${action}`;
-	}
 	// Ring finger folded down
 	if (handLandmarks[16].y > handLandmarks[14].y && handLandmarks[15].y > handLandmarks[14].y) {
 		// Middle finger pointed down
@@ -144,32 +174,25 @@ function determinePose(handLandmarks) {
 		} else {
 			action = PoseEnum.NONE;
 		}
-
-		if (action === PoseEnum.NONE) percent = 0;
-		else percent += 2.8;
 	}
 	// Ring && Middle && Pinky finger pointed up
 	else if (handLandmarks[12].y < handLandmarks[10].y && handLandmarks[11].y < handLandmarks[10].y &&
 			handLandmarks[20].y < handLandmarks[18].y && handLandmarks[19].y < handLandmarks[18].y) {
 		// Thumb & Pointer finger ends close together
 		if (dis(handLandmarks[4], handLandmarks[8]) < 0.06) {
-			percent += 1.8;
 			action = PoseEnum.OK;
 		}
 		// Distance beetween all neighboor fingers (apart from thumb) small enough
 		else if (dis(handLandmarks[8], handLandmarks[12]) < 0.08 &&
 				dis(handLandmarks[12], handLandmarks[16]) < 0.08 &&
 				dis(handLandmarks[15], handLandmarks[20]) < 0.08) {
-					percent += 1.8;
 					action = PoseEnum.TOGETHER;
 		} else {
-			percent += 1.8;
 			action = PoseEnum.OPEN;
 		}
 	}
 
-	if (action === PoseEnum.NONE) return "Pose: " + PoseEnum.NONE;
-	return `Pose: ${action} - Loading ${Math.floor(percent)}`;
+	return action;
 }
 
 function dis(pointA, pointB) {
@@ -217,9 +240,6 @@ const PoseEnum = Object.freeze({
 	"NONE": "None"
 });
 
-const rockImg = new Image();
-rockImg.src = "https://static.thenounproject.com/png/6270-200.png";
-
 const peaceImg = new Image();
 peaceImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Peace_sign.svg/1200px-Peace_sign.svg.png";
 
@@ -227,4 +247,34 @@ const spaceImg = new Image();
 spaceImg.src = "https://lh3.googleusercontent.com/YGJ77qN9KiwctZgfqV8Bf3hNo0rZvcFaPKDTkvtS6kVbtwyCS80Pm6dpXzJCCLZE1Q";
 spaceImg.onload = function() {
 	spaceStyle = ctx.createPattern(spaceImg, "repeat");
+}
+
+const rockImg1 = new Image();
+rockImg1.src = "https://i.pinimg.com/originals/ef/4b/d1/ef4bd14be4d6f59bda1e080ed6db167b.jpg";
+rockImg1.onload = function() {
+	rockImages.push(rockImg1);
+}
+
+const rockImg2 = new Image();
+rockImg2.src = "https://www.metalsucks.net/wp-content/uploads/2017/08/metallicaheavymontreal2017-1280x720.jpg";
+rockImg2.onload = function() {
+	rockImages.push(rockImg2);
+}
+
+const rockImg3 = new Image();
+rockImg3.src = "https://www.udiscovermusic.com/wp-content/uploads/2019/09/Guns-N-Roses-GettyImages-1201731181.jpg";
+rockImg3.onload = function() {
+	rockImages.push(rockImg3);
+}
+
+const rockImg4 = new Image();
+rockImg4.src = "https://www.dw.com/image/39219505_101.jpg";
+rockImg4.onload = function() {
+	rockImages.push(rockImg4);
+}
+
+const rockImg5 = new Image();
+rockImg5.src = "https://imagery.zoogletools.com/u/139366/a4dc5fbc83bd93cd6953250a8422cf7448b67195/original/hannah-montana-album.jpg";
+rockImg5.onload = function() {
+	rockImages.push(rockImg5);
 }
