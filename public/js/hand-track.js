@@ -75,9 +75,11 @@ function onResults(results) {
 					lockedPose = handPose;
 					textElement.innerHTML = "Locked Pose: " + handPose;
 					if (lockedPose === PoseEnum.ROCK) {
-						randomImg = rockImages[Math.floor(Math.random() * rockImages.length)];
-						rockStyle = ctx.createPattern(randomImg, "repeat");
-					}
+						let random = Math.floor(Math.random() * rockImages.length);
+						rockStyle = ctx.createPattern(rockImages[random], "repeat");
+						socket.emit("styleChange", lockedPose + "-" + random);
+					} else { socket.emit("styleChange", lockedPose); }
+					
 				} else textElement.innerHTML = `Pose: ${handPose} - Loading ${Math.floor(percent)}`;
 			}
 			
@@ -98,7 +100,7 @@ function onResults(results) {
 						// Draw based on locked action
 						drawBasedOnLockedAction(lastPoint, pointerFinger, lineWidth);
 						lastPoint = pointerFinger;
-						socket.emit("point", {x: pointerFinger[0], y: pointerFinger[1]});
+						socket.emit("point", {point: pointerFinger, lineWidth: lineWidth});
 					} else { lastPoint = null; }
 				}
 			}
@@ -106,13 +108,14 @@ function onResults(results) {
 	} else {
 		lastPoint = null;
 
-		if (nonePercent >= 100) {
+		if (nonePercent >= 100 && lockedPose !== null) {
 			percent = 0;
 			count = 0;
 			points = [];
 			lockedPose = null;
 			action = PoseEnum.NONE;
 			textElement.innerHTML = "Pose: " + PoseEnum.NONE;
+			socket.emit("styleChange", PoseEnum.NONE);
 		} else { nonePercent += 1; }
 	}
   	canvasCtx.restore();  
@@ -250,31 +253,31 @@ spaceImg.onload = function() {
 }
 
 const rockImg1 = new Image();
-rockImg1.src = "https://i.pinimg.com/originals/ef/4b/d1/ef4bd14be4d6f59bda1e080ed6db167b.jpg";
+rockImg1.src = "https://i.imgur.com/5PufBJ5.jpg";
 rockImg1.onload = function() {
-	rockImages.push(rockImg1);
+	rockImages[0] = rockImg1;
 }
 
 const rockImg2 = new Image();
-rockImg2.src = "https://www.metalsucks.net/wp-content/uploads/2017/08/metallicaheavymontreal2017-1280x720.jpg";
+rockImg2.src = "https://i.imgur.com/EQRAP9r.jpg";
 rockImg2.onload = function() {
-	rockImages.push(rockImg2);
+	rockImages[1] = rockImg2;
 }
 
 const rockImg3 = new Image();
-rockImg3.src = "https://www.udiscovermusic.com/wp-content/uploads/2019/09/Guns-N-Roses-GettyImages-1201731181.jpg";
+rockImg3.src = "https://i.imgur.com/1EE0wIZ.jpg";
 rockImg3.onload = function() {
-	rockImages.push(rockImg3);
+	rockImages[2] = rockImg3;
 }
 
 const rockImg4 = new Image();
-rockImg4.src = "https://www.dw.com/image/39219505_101.jpg";
+rockImg4.src = "https://i.imgur.com/siCL3id.jpg";
 rockImg4.onload = function() {
-	rockImages.push(rockImg4);
+	rockImages[3] = rockImg4;
 }
 
 const rockImg5 = new Image();
-rockImg5.src = "https://imagery.zoogletools.com/u/139366/a4dc5fbc83bd93cd6953250a8422cf7448b67195/original/hannah-montana-album.jpg";
+rockImg5.src = "https://i.imgur.com/InslIik.jpg";
 rockImg5.onload = function() {
-	rockImages.push(rockImg5);
+	rockImages[4] = rockImg5;
 }

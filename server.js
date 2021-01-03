@@ -27,11 +27,12 @@ function newConnection(socket) {
     } else {
         if (adminClientId === null) return
         console.log("New client has connected with id: " + socket.id);
-        io.to(adminClientId).emit("newClient", {id: socket.id, color: "#1a1aff", lastPoint: null});
+        io.to(adminClientId).emit("newClient", {id: socket.id, color: "#1a1aff", lastPoint: null, style: "None", points: []});
     }
 
     socket.on("point", draw)
     socket.on("colorChange", colorChange);
+    socket.on("styleChange", styleChange);
 
     function colorChange(data) {
         if (adminClientId !== null) {
@@ -39,9 +40,15 @@ function newConnection(socket) {
         }
     }
 
+    function styleChange(data) {
+        if (adminClientId !== null) {
+            io.to(adminClientId).emit("styleChange", {id: socket.id, style: data});
+        }
+    }
+
     function draw(data) {
         if (adminClientId !== null) {
-            io.to(adminClientId).emit("point", {id: socket.id, coordinates: data});
+            io.to(adminClientId).emit("point", {id: socket.id, point: data.point, lineWidth: data.lineWidth});
         }
     }
 }

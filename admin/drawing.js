@@ -1,5 +1,6 @@
-function drawLine(ctx, canvasEle, pointA, pointB, lineWidth) {
+function drawLine(ctx, canvasEle, pointA, pointB, lineWidth, color) {
     ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(pointA[0] * canvasEle.width, pointA[1] * canvasEle.height);
     ctx.lineTo(pointB[0] * canvasEle.width, pointB[1] * canvasEle.height);
