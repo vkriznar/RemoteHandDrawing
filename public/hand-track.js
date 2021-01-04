@@ -127,7 +127,7 @@ function drawBasedOnLockedAction(lastPoint, pointerFinger, lineWidth) {
 
 	switch (lockedPose) {
 		case PoseEnum.OPEN:
-			drawLine(ctx, canvasElement1, lastPoint, pointerFinger, lineWidth);
+			drawLine(ctx, canvasElement1, lastPoint, pointerFinger, lineWidth, ctx.fillStyle);
 			break;
 		case PoseEnum.TOGETHER:
 			drawStickingLine(ctx, canvasElement1, pointerFinger, points);
