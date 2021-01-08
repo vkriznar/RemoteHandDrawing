@@ -92,6 +92,21 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 }
 
+function copyUrl(button) {
+	let tempInput = document.createElement("input");
+	let value = window.location.href.replace("admin/", "");
+	tempInput.value = value;
+	document.body.appendChild(tempInput);
+	tempInput.select();
+	document.execCommand("copy");
+	document.body.removeChild(tempInput);
+	
+	button.innerHTML = "URL Copied";
+	setTimeout(() => {
+		button.innerHTML = "Copy URL for Users";
+	}, 1000);
+}
+
 const PoseEnum = Object.freeze({
 	"FIST": "FIST",
 	"ROCK": "ROCK'N'ROLL",

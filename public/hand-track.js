@@ -244,7 +244,7 @@ const PoseEnum = Object.freeze({
 });
 
 const peaceImg = new Image();
-peaceImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Peace_sign.svg/1200px-Peace_sign.svg.png";
+peaceImg.src = "https://i.pinimg.com/originals/1a/e6/aa/1ae6aa3a53c30b4b083f8db672ae92cd.png";
 
 const spaceImg = new Image();
 spaceImg.src = "https://lh3.googleusercontent.com/YGJ77qN9KiwctZgfqV8Bf3hNo0rZvcFaPKDTkvtS6kVbtwyCS80Pm6dpXzJCCLZE1Q";
